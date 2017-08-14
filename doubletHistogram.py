@@ -5,9 +5,9 @@ import time
 import numpy as np
 import json
 import doubletdetection
-# FNAME = "~/Google Drive/Computational Genomics/pbmc8k_dense.csv"
+FNAME = "~/Google Drive/Computational Genomics/pbmc8k_dense.csv"
 # FNAME = "~/Google Drive/Computational Genomics/pbmc_4k_dense.csv"
-FNAME = "~/Google Drive/Computational Genomics/clean_5050.csv"
+# FNAME = "~/Google Drive/Computational Genomics/clean_5050.csv"
 HITS_FNAME = "doubletHistogram-hits.txt"
 RAW_FNAME = "doubletHistogram-raw_results.npy"
 
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     PCAs = [15, 20, 25, 30, 40, 50, 75]
     MAX_HITS = len(BRs) * len(KNNs) * len(PCAs)
     (num_cells, num_genes) = raw_counts.shape
-    raw_results = np.zeros((len(BRs), len(KNNs), len(PCAs), num_cells))
-    hits = np.zeros((num_cells))
+    raw_results = np.zeros((len(BRs), len(KNNs), len(PCAs), num_cells), dtype='int16')
+    hits = np.zeros((num_cells), dtype='int')
 
     runs_so_far = 0
     for i_br, br in enumerate(BRs):
@@ -40,6 +40,10 @@ if __name__ == '__main__':
             f.write("KNNs = {}\n".format(KNNs))
             f.write("PCAs = {}\n".format(PCAs))
             f.write("Max hits possible so far: {0:d}\n".format(runs_so_far))
+            test_runs_so_far = i_br * (len(KNNs) * len(PCAs)) + j_knn * len(PCAs) + k_pca + 1
+            assert runs_so_far == test_runs_so_far, (
+                "{0} != {1} * ({2} * {3}) + {4} * {3} + {5} + 1 [aka {6}]".format(
+                    runs_so_far, i_br, len(KNNs), len(PCAs), j_knn, k_pca, test_runs_so_far))
             f.write("Most recent run ({0:d}/{1:d}) --- ".format(runs_so_far, MAX_HITS))
             f.write("Elapsed runtime(wall, CPU): ({0:.2f}, {0:.2f}) seconds\n".format(
                 time.time() - start_time['wall'], time.process_time() - start_time['CPU']))

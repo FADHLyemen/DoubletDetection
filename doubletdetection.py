@@ -77,7 +77,8 @@ class BoostClassifier(object):
         print("\nClustering mixed data set with Phenograph...\n")
         # Get phenograph results
         pca = PCA(n_components=self.n_pca)
-        reduced_counts = pca.fit_transform(aug_counts)
+        pca.fit(self._norm_counts)
+        reduced_counts = pca.transform(aug_counts)
         fullcommunities, _, _ = phenograph.cluster(reduced_counts, k=self.knn)
         min_ID = min(fullcommunities)
         if min_ID < 0:
